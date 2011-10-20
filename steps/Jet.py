@@ -481,6 +481,18 @@ class uniquelyMatchedNonisoMuons(analysisStep) :
     def select(self,eventVars) :
         return eventVars["crock"]["%s%sNonIsoMuonsUniquelyMatched"%self.cs]
 #####################################
+class nonIsoMuonDominatesJet(analysisStep) :
+
+    def __init__(self,collection, threshold = None) :
+        self.cs = collection
+        self.threshold = threshold
+        self.moreName = "%s%s; threshold = %g"%(self.cs+(threshold,))
+    def select(self,eventVars) :
+        d = eventVars["crock"]["%s%sJetModified"%self.cs]
+        for iJet,valueDict in d.iteritems() :
+            print iJet,valueDict
+        return True
+#####################################
 class ecalDeadTowerHistogrammer(analysisStep) :
 
     def __init__(self,collection,thresholds = [0]) :
