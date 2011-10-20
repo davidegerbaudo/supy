@@ -55,6 +55,10 @@ class xcJet(wrappedChain.calculable) :
         matchedMuons = []
 
         self.value = utils.vector()
+
+        mods = "%s%sJetModified"%self.xcjets
+        self.source["crock"][mods] = {}
+        
         for iJet in range(len(jetP4s)) :
             self.value.push_back(self.jes(jetP4s[iJet]))
             
@@ -66,7 +70,10 @@ class xcJet(wrappedChain.calculable) :
             for p4 in self.matchesIn("muon",self.value[iJet], exitEarly=False, indicesStr="%sIndicesNonIso%s") :
                 matchedMuons.append(p4)
                 nMuonsMatched[iJet] += 1
-                if self.correctForMuons: self.value[iJet] += p4
+                if self.correctForMuons :
+                    self.source["crock"][mods][iJet] = {"origPt":self.value[iJet].pt(), "muonPt":p4.pt()}
+                    self.value[iJet] += p4
+                    self.source["crock"][mods][iJet]["newPt"] = self.value[iJet].pt()
 
         if self.other["muon"][0] :
             nonisomu = self.source["%sIndicesNonIso%s"%self.other["muon"][0]]
