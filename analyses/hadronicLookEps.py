@@ -5,64 +5,6 @@ from core import analysis,plotter,utils
 import steps,calculables,samples
 import ROOT as r
 
-def triggerTuple(l = [], keys = []) :
-    out = []
-    for item in l :
-        stem = "HLT"
-        for key in keys :
-            stem += "_%s%s"%(key, str(item[key]).replace(".","p"))
-        for version in item["v"] :
-            out.append("%s_v%d"%(stem, version))
-    return tuple(out)
-
-#required to be sorted
-triggers_ht_2010 = ("HLT_HT100U","HLT_HT100U_v3","HLT_HT120U","HLT_HT140U","HLT_HT150U_v3")
-
-triggers_ht_eps = tuple(["HLT_HT250_MHT60_v%d"%i for i in [2,3,4,6,7]   ]+
-                        ["HLT_HT250_MHT70_v%d"%i for i in [1,3,4]       ]+
-                        ["HLT_HT250_MHT80_v%d"%i for i in [3,4]         ]+
-                        ["HLT_HT250_MHT90_v%d"%i for i in [1]           ]+
-                        ["HLT_HT250_MHT100_v%d"%i for i in [1]          ]+
-                        ["HLT_HT260_MHT60_v%d"%i for i in [2]           ])
-
-triggers_mht_2011 = triggerTuple(l = [{"HT":250, "MHT":  60, "v":[1,2,3,4,5,6,7]},
-                                      {"HT":260, "MHT":  60, "v":[1,2]},
-                                      {"HT":250, "MHT":  70, "v":[1,2,3,4]},
-                                      {"HT":250, "MHT":  80, "v":[1,2,3,4]},
-                                      {"HT":250, "MHT":  90, "v":[1,2,3,4]},
-                                      {"HT":250, "MHT": 100, "v":[1,2]},
-                                      
-                                      {"HT":300, "MHT":  75, "v":[1,2,3,4,5,6,7,8]},
-                                      {"HT":300, "MHT":  80, "v":[1,2]},
-                                      {"HT":300, "MHT":  90, "v":[1,2]},
-                                      
-                                      {"HT":350, "MHT":  70, "v":[1,2]},
-                                      {"HT":350, "MHT":  80, "v":[1,2]},
-                                      {"HT":350, "MHT":  90, "v":[1]},
-
-                                      {"HT":400, "MHT":  80, "v":[1]},
-                                      ], keys = ("HT", "MHT"))
-                                      
-triggers_alphaT_2011 = triggerTuple(l  = [#{"HT":250, "AlphaT": 0.53, "v":range(1,7)},
-                                          #{"HT":250, "AlphaT": 0.54, "v":range(2,5)},
-                                          #{"HT":250, "AlphaT": 0.55, "v":range(1,3)},
-                                          #{"HT":250, "AlphaT": 0.62, "v":range(1,3)},
-                                          
-                                          {"HT":300, "AlphaT": 0.52, "v":range(1,6)},
-                                          {"HT":300, "AlphaT": 0.53, "v":range(1,7)},
-                                          #{"HT":300, "AlphaT": 0.54, "v":range(1,3)},
-                                          
-                                          {"HT":350, "AlphaT": 0.51, "v":range(1,6)},
-                                          {"HT":350, "AlphaT": 0.52, "v":range(1,3)},
-                                          {"HT":350, "AlphaT": 0.53, "v":range(1,8)},
-                                          
-                                          {"HT":400, "AlphaT": 0.51, "v":range(1,8)},
-                                          {"HT":400, "AlphaT": 0.52, "v":range(1,3)},
-                                          
-                                          {"HT":450, "AlphaT": 0.51, "v":range(1,3)},
-                                          {"HT":450, "AlphaT": 0.52, "v":range(1,3)},
-                                          ], keys = ("HT", "AlphaT"))
-
 class hadronicLook(analysis.analysis) :
     def parameters(self) :
         objects = self.vary()
@@ -100,10 +42,28 @@ class hadronicLook(analysis.analysis) :
                                                 ("325_scaled", (325.0, 375.0,  86.7, 43.3)),#3
                                                 ("275_scaled", (275.0, 325.0,  73.3, 36.7)),#4
                                                 ][2:3] )),
-                 "triggerList": triggers_mht_2011,
+                 #required to be sorted
+                 #"triggerList" : ("HLT_HT100U","HLT_HT100U_v3","HLT_HT120U","HLT_HT140U","HLT_HT150U_v3"), #2010
+                 #"triggerList": ("HLT_HT250_AlphaT0p55_v1","HLT_HT250_AlphaT0p55_v2","HLT_HT250_MHT60_v2","HLT_HT250_MHT60_v3","HLT_HT260_MHT60_v2","HLT_HT300_MHT75_v2","HLT_HT300_MHT75_v3","HLT_HT300_MHT75_v4"),#alphaT trigger test
+                 "triggerList": tuple(["HLT_HT250_MHT60_v%d"%i for i in [2,3,4,6,7]   ]+
+                                      ["HLT_HT250_MHT70_v%d"%i for i in [1,3,4]       ]+
+                                      ["HLT_HT250_MHT80_v%d"%i for i in [3,4]         ]+
+                                      ["HLT_HT250_MHT90_v%d"%i for i in [1]           ]+
+                                      ["HLT_HT250_MHT100_v%d"%i for i in [1]          ]+
+                                      ["HLT_HT260_MHT60_v%d"%i for i in [2]           ]
+
+                                      #["HLT_HT300_MHT75_v%d"%i for i in [2,3,4,5,7,8] ]+
+                                      #["HLT_HT300_MHT80_v%d"%i for i in [1]           ]+
+                                      #["HLT_HT300_MHT90_v%d"%i for i in [1]           ]+
+                                      #
+                                      #["HLT_HT350_MHT70_v%d"%i for i in [1]           ]+
+                                      #["HLT_HT350_MHT80_v%d"%i for i in [1]           ]+
+                                      #
+                                      #["HLT_HT250_MHT100_v%d"%i for i in [1]]
+                                      )
                  }
 
-    def ra1Cosmetics(self) : return False
+    def ra1Cosmetics(self) : return True
     
     def calcListJet(self, obj, etRatherThanPt, ptMin, lowPtThreshold, lowPtName, highPtThreshold, highPtName, htThreshold) :
         def calcList(jet, met, photon, muon, electron, muonsInJets, jetIdFlag) :
@@ -346,30 +306,12 @@ class hadronicLook(analysis.analysis) :
             [ steps.Other.passFilter("final") ]
     
     def listOfSampleDictionaries(self) :
-        return [samples.HT.ht, samples.JetMET.jetmet, samples.MC.mc]
+        return [samples.MC.mc, samples.JetMET.jetmet, samples.SignalSkim.signalSkim]
 
     def listOfSamples(self,params) :
         from samples import specify
 
         def data() :
-            out = []
-
-            #2011
-            jwPrompt = calculables.Other.jsonWeight("cert/Cert_160404-177515_7TeV_PromptReco_Collisions11_JSON.txt")
-            jwMay = calculables.Other.jsonWeight("cert/Cert_160404-163869_7TeV_May10ReReco_Collisions11_JSON_v3.txt")
-            jwAug = calculables.Other.jsonWeight("cert/Cert_170249-172619_7TeV_ReReco5Aug_Collisions11_JSON_v2.txt")
-            
-            out += specify(names = "HT.Run2011A-May10ReReco-v1.AOD.job536", weights = jwMay   , overrideLumi = 204.4)
-            out += specify(names = "HT.Run2011A-05Aug2011-v1.AOD.job528",   weights = jwAug   , overrideLumi = 360.3)
-            out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.job535",  weights = jwPrompt, overrideLumi = 730.6)
-            out += specify(names = "HT.Run2011A-PromptReco-v6.AOD.job527",  weights = jwPrompt, overrideLumi = 640.2)
-            out += specify(names = "HT.Run2011B-PromptReco-v1.AOD.job515",  weights = jwPrompt, overrideLumi = 200.7)
-            out += specify(names = "HT.Run2011B-PromptReco-v1.AOD.job519",  weights = jwPrompt, overrideLumi = 254.6)
-            out += specify(names = "HT.Run2011B-PromptReco-v1.AOD.job531",  weights = jwPrompt, overrideLumi = 248.7)
-
-            return out
-
-        def dataEps() :
             out = []
 
             jw = calculables.Other.jsonWeight("cert/Cert_160404-167913_7TeV_PromptReco_Collisions11_JSON.txt") #1078/pb            
@@ -417,28 +359,17 @@ class hadronicLook(analysis.analysis) :
             return specify( effectiveLumi = eL, color = r.kGreen,
                             names = [("g_jets_mg_ht_%d_%d")[:None if t[1] else -2] for t in zip(gM,gM[1:]+["inf"])] )
 
-        def ttbar_mg(eL, era = "") :
-            names = ""
-            if era=="spring11" : names = "tt_tauola_mg"
-            if era=="summer11" : names = "tt_jets_mg_tauola_summer11"
-            return specify( names = names, effectiveLumi = eL, color = r.kOrange)
+        def ttbar_mg(eL) :
+            return specify( names = "tt_tauola_mg", effectiveLumi = eL, color = r.kOrange)
         
-        def ewk(eL, era = "") :
-            zName = ""
-            wName = ""
-            if era=="spring11" :
-                zName = "zinv_jets_mg"
-                wName = "w_jets_mg"
-            if era=="summer11" :
-                zName = "znunu_jets_mg_ht_200_inf_summer11_skim"
-                wName = "w_jets_mg_tauola_ht_300_inf_summer11"
-            
-            return ( specify(names = zName,  effectiveLumi = eL, color = r.kRed + 1) +
+        def ewk(eL) :
+            return ( specify(names = "zinv_jets_mg",  effectiveLumi = eL, color = r.kRed + 1) +
                      #specify(names = "z_jets_mg_v12_skim", effectiveLumi = eL, color = r.kYellow-3) +
-                     specify(names = wName, effectiveLumi = eL, color = 28         ) )
+                     specify(names = "w_jets_mg", effectiveLumi = eL, color = 28         ) )
 
         def susy(eL) :
-            return specify(names = "lm6", effectiveLumi = eL, color = r.kRed)
+            return ( specify(names = "lm1", effectiveLumi = eL, color = r.kMagenta) +
+                     specify(names = "lm6", effectiveLumi = eL, color = r.kRed) )
 
         def scan(tanBeta) :
             return specify(names = "scan_tanbeta%d"%tanBeta, color = r.kMagenta, nFilesMax = 1)
@@ -446,40 +377,54 @@ class hadronicLook(analysis.analysis) :
         qcd_func,g_jets_func = {"py6": (qcd_py6,g_jets_py6),
                                 "py8": (qcd_py8,g_jets_py6), # no g_jets_py8 available
                                 "mg" : (qcd_mg, g_jets_mg ) }[params["mcSoup"]]
-        #era = "spring11"
-        era = "summer11"
-        smLumi = 30000 # 1/pb
-        susyLumi = 60000
+        eL = 30000 # 1/pb
+        susyEL = eL
         #return data()
         return ( data() +
-                 qcd_func(smLumi) + #g_jets_func(eL) +
-                 ttbar_mg(smLumi, era = era) + ewk(smLumi, era = era) +
-                 susy(susyLumi)
+                 qcd_func(eL) + #g_jets_func(eL) +
+                 ttbar_mg(eL) + ewk(eL) +
+                 susy(susyEL)
                  ) if params["tanBeta"]==None else scan(params["tanBeta"])
 
     def mergeSamples(self, org) :
-        def md(x, y) :
-            x.update(y)
-            return x
-        
-        org.mergeSamples(targetSpec = {"name":"2011 Data", "color":r.kBlack, "markerStyle":20}, allWithPrefix = "HT.Run2011")
+        def py8(org, smSources) :
+            org.mergeSamples(targetSpec = {"name":"qcd_py8", "color":r.kBlue}, allWithPrefix="qcd_py8")
+            org.mergeSamples(targetSpec = {"name":"g_jets_py6_v12", "color":r.kGreen}, allWithPrefix="v12_g_jets_py6")
+            smSources.append("qcd_py8")
+            smSources.append("g_jets_py6_v12")
 
-        mcOps = {"markerStyle":1, "lineWidth":3, "goptions":"hist"}
+        def mg(org, smSources) :
+            org.mergeSamples(targetSpec = {"name":"qcd_mg", "color":r.kBlue}, allWithPrefix="v12_qcd_mg")
+            org.mergeSamples(targetSpec = {"name":"g_jets_mg", "color":r.kGreen}, allWithPrefix="v12_g_jets_mg")
+            smSources.append("qcd_mg_v12")
+            smSources.append("g_jets_mg_v12")
+
+        ewkSources = ["tt_tauola_mg", "zinv_jets_mg", "w_jets_mg"] #note: include DY samples
+        smSources = copy.deepcopy(ewkSources)
+        for i in range(len(smSources)) :
+            smSources[i] = smSources[i]+(self.skimString if hasattr(self,"skimString") else "")
+
+        lineWidth = 3
+        goptions = "hist"
+        if "pythia8"  in org.tag : py8(org, smSources)
+        if "madgraph" in org.tag : mg (org, smSources)
         if "pythia6"  in org.tag :
-            org.mergeSamples(targetSpec = md({"name":"QCD Multijet", "color":r.kGreen+3}, mcOps), allWithPrefix = "qcd_py6")
-        org.mergeSamples(targetSpec = md({"name":"tt", "color": r.kBlue}, mcOps), allWithPrefix = "tt")
-        org.mergeSamples(targetSpec = md({"name":"Z + jets", "color": r.kRed+1}, mcOps), allWithPrefix = "z")
-        org.mergeSamples(targetSpec = md({"name":"W + jets", "color": r.kOrange-3}, mcOps), allWithPrefix = "w_jets")
-        org.mergeSamples(targetSpec = md({"name":"LM6", "color":r.kMagenta}, mcOps), allWithPrefix = "lm6")
-        ewkSources = ["tt", "Z + jets", "W + jets"]
-        qcdSources = ["QCD Multijet"]
+            if not self.ra1Cosmetics() :
+                org.mergeSamples(targetSpec = {"name":"qcd_py6", "color":r.kBlue}, allWithPrefix="qcd_py6")
+                smSources.append("qcd_py6")
+            else :
+                org.mergeSamples(targetSpec = {"name":"QCD Multijet", "color":r.kGreen+3, "markerStyle":1, "lineWidth":lineWidth, "goptions":goptions}, allWithPrefix="qcd_py6")
 
-        if not self.ra1Cosmetics() :
-            org.mergeSamples(targetSpec = md({"name":"Standard Model ", "color":r.kAzure+6}, mcOps), sources = ewkSources + qcdSources, keepSources = True)
-        else :
-            ewk = "t#bar{t}, W, Z + Jets"
-            org.mergeSamples(targetSpec = md({"name":ewk, "color":r.kBlue}, mcOps), sources = ewkSources)
-            org.mergeSamples(targetSpec = md({"name":"Standard Model ", "color":r.kAzure+6}, mcOps), sources = qcdSources + [ewk], keepSources = True)
+        #org.mergeSamples(targetSpec = {"name":"2010 Data", "color":r.kBlack, "markerStyle":20}, allWithPrefix="Nov4")
+        org.mergeSamples(targetSpec = {"name":"2011 Data", "color":r.kBlack, "markerStyle":20}, allWithPrefix="HT.Run2011A")
+
+        if not self.ra1Cosmetics() : 
+            org.mergeSamples(targetSpec = {"name":"standard_model", "color":r.kGreen+3}, sources = smSources, keepSources = True)        
+        else : #Henning's requests
+            org.mergeSamples(targetSpec = {"name":"t#bar{t}, W, Z + Jets", "color":r.kBlue, "markerStyle":1, "lineWidth":lineWidth, "goptions":goptions}, sources = ewkSources)
+            org.mergeSamples(targetSpec = {"name":"Standard Model ", "color":r.kAzure+6, "markerStyle":1, "lineWidth":lineWidth, "goptions":goptions}, sources = ["QCD Multijet", "t#bar{t}, W, Z + Jets"], keepSources = True)
+            org.mergeSamples(targetSpec = {"name":"LM1", "color":r.kRed,     "lineStyle":9, "markerStyle":1, "lineWidth":lineWidth, "goptions":goptions}, allWithPrefix="lm1")
+            org.mergeSamples(targetSpec = {"name":"LM6", "color":r.kMagenta, "lineStyle":2, "markerStyle":1, "lineWidth":lineWidth, "goptions":goptions}, allWithPrefix="lm6")
 
     def conclude(self, conf) :
         org = self.organizer(conf)
@@ -496,10 +441,11 @@ class hadronicLook(analysis.analysis) :
         #plot
         pl = plotter.plotter(org,
                              psFileName = self.psFileName(org.tag),
-                             samplesForRatios = ("2011 Data","Standard Model "),
+                             samplesForRatios = ("2011 Data","standard_model" if not self.ra1Cosmetics() else "Standard Model "),
                              sampleLabelsForRatios = ("data","s.m."),
+                             #samplesForRatios = ("calo_325_scaled.xcak5JetnJetsWeightPat", "calo_325_scaled"),
+                             #sampleLabelsForRatios = ("3jet","Njet"),
                              showStatBox = not self.ra1Cosmetics(),
-                             rowColors = [r.kBlack, r.kViolet+4],
                              #whiteList = ["lowestUnPrescaledTrigger"],
                              #doLog = False,
                              #compactOutput = True,
