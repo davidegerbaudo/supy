@@ -181,8 +181,8 @@ class hadronicLook(analysis.analysis) :
         scanBefore = [steps.Other.passFilter("scanBefore"), steps.Gen.scanHistogrammer(tanBeta = params["tanBeta"])] if params["tanBeta"]!=None else []
         scanAfter = [steps.Other.passFilter("scanAfter"),
                      steps.Gen.scanHistogrammer(tanBeta = params["tanBeta"], htVar = "%sSum%s%s"%(_jet[0], _et, _jet[1]))] if params["tanBeta"]!=None else []
-        htUpper = [steps.Other.variableLessFilter(params["thresholds"][1],"%sSum%s%s"%(_jet[0], _et, _jet[1]), "GeV")] if params["thresholds"][1]!=None else []
-        return scanBefore + [
+
+        eventLeadingJets = [
             steps.Print.progressPrinter(),
             steps.Trigger.lowestUnPrescaledTriggerFilter(),
             steps.Trigger.l1Filter("L1Tech_BPTX_plus_AND_minus.v0"),
@@ -194,8 +194,6 @@ class hadronicLook(analysis.analysis) :
             steps.Other.histogrammer("genpthat",200,0,1000,title=";#hat{p_{T}} (GeV);events / bin"),
             steps.Trigger.hltPrescaleHistogrammer(params["triggerList"]),
             
-            #steps.Other.cutSorter([
-
             ##when using full scaling
             #steps.Jet.htBinFilter(_jet, min = params["htBin"], max = params["htBin"]),
             #steps.Jet.jetSelector(_jet, params["thresholds"][2], 0),
@@ -207,7 +205,9 @@ class hadronicLook(analysis.analysis) :
             steps.Jet.jetEtaSelector(_jet,2.5,0),
             
             #steps.Other.iterHistogrammer("ecalDeadTowerTrigPrimP4", 256, 0.0, 128.0, title=";E_{T} of ECAL TP in each dead region (GeV);TPs / bin", funcString="lambda x:x.Et()"),
-            ]+(
+            ]
+
+        multXc = (
             steps.Other.multiplicityPlotFilter("vertexIndices",                  nMin = 1, xlabel = "N vertices") +
             steps.Other.multiplicityPlotFilter("%sIndices%s"%_muon,              nMax = 0, xlabel = "N muons") +
             steps.Other.multiplicityPlotFilter("%sIndices%s"%_electron,          nMax = 0, xlabel = "N electrons") +
@@ -216,25 +216,32 @@ class hadronicLook(analysis.analysis) :
             steps.Other.multiplicityPlotFilter("%sIndicesOther%s"%_muon,         nMax = 0, xlabel = "number of %s%s above p_{T}#semicolon failing ID or #eta"%_muon) +
             steps.Other.multiplicityPlotFilter("%sIndicesUnmatched%s"%_electron, nMax = 0, xlabel = "N electrons unmatched") +
             steps.Other.multiplicityPlotFilter("%sIndicesUnmatched%s"%_photon,   nMax = 0, xlabel = "N photons unmatched") +
-            steps.Other.multiplicityPlotFilter("%sIndices%s"%_jet, nMin=params["nJetsMinMax"][0], nMax=params["nJetsMinMax"][1], xlabel="number of %s%s passing ID#semicolon p_{T}#semicolon #eta cuts"%_jet)
-            )+[
-            steps.Jet.uniquelyMatchedNonisoMuons(_jet), 
+            steps.Other.multiplicityPlotFilter("%sIndices%s"%_jet,               nMin=params["nJetsMinMax"][0], nMax=params["nJetsMinMax"][1],
+                                               xlabel="number of %s%s passing ID#semicolon p_{T}#semicolon #eta cuts"%_jet)
+            )+[steps.Jet.uniquelyMatchedNonisoMuons(_jet)]
             
+        ht = [
             steps.Other.histogrammer("%sSum%s%s"%(_jet[0], _et, _jet[1]), 50, 0, 2500, title = ";H_{T} (GeV) from %s%s %ss;events / bin"%(_jet[0], _jet[1], _et)),
             steps.Other.variableGreaterFilter(params["thresholds"][0],"%sSum%s%s"%(_jet[0], _et, _jet[1]), "GeV"),
-            ] + htUpper + [
+            ] + [steps.Other.variableLessFilter(params["thresholds"][1],"%sSum%s%s"%(_jet[0], _et, _jet[1]), "GeV")] if params["thresholds"][1]!=None else []
+
+        mhtOverMet = [
             steps.Other.histogrammer("%sMht%sOver%s"%(_jet[0],_jet[1]+params["highPtName"],_met), 100, 0.0, 3.0,
                                      title = ";MHT %s%s / %s;events / bin"%(_jet[0],_jet[1]+params["highPtName"],_met)),
             steps.Other.variableLessFilter(1.25,"%sMht%sOver%s"%(_jet[0],_jet[1]+params["highPtName"],_met)),
-            
+            ]
+
+        mht = [
             steps.Other.histogrammer("%sSumP4%s"%_jet, 50, 0, 500, title = ";MHT from %s%s (GeV);events / bin"%_jet, funcString = "lambda x:x.pt()"),
             steps.Other.variablePtGreaterFilter(100.0,"%sSumP4%s"%_jet,"GeV"),
+            ]
+
+        prePlots = [
             steps.Other.histogrammer("vertexIndices", 20, -0.5, 19.5, title=";N vertices;events / bin", funcString="lambda x:len(x)"),
             steps.Other.histogrammer("vertexSumPt", 100, 0.0, 1.0e3, title = ";SumPt of 2nd vertex (GeV);events / bin", funcString = "lambda x:([0.0,0.0]+sorted(x))[-2]"),
             #steps.Other.histogrammer("logErrorTooManySeeds",    2, 0.0, 1.0, title = ";logErrorTooManySeeds;events / bin"),
             #steps.Other.histogrammer("logErrorTooManyClusters", 2, 0.0, 1.0, title = ";logErrorTooManyClusters;events / bin"),
             
-            #many plots
             steps.Trigger.lowestUnPrescaledTriggerHistogrammer(),
             steps.Other.passFilter("singleJetPlots1"),
             steps.Jet.singleJetHistogrammer(_jet),
@@ -246,28 +253,24 @@ class hadronicLook(analysis.analysis) :
             steps.Other.passFilter("kinematicPlots1"),
 
             steps.Jet.alphaHistogrammer(cs = _jet, deltaPhiStarExtraName = params["lowPtName"], etRatherThanPt = _etRatherThanPt),
+            ]
+
+        deadEcal = [
             steps.Other.deadEcalFilter(jets = _jet, extraName = params["lowPtName"], dR = 0.3, dPhiStarCut = 0.5),
-            
+            ]
+
+        aPlots = [
             steps.Jet.cleanJetHtMhtHistogrammer(_jet,_etRatherThanPt),
             steps.Jet.alphaHistogrammer(cs = _jet, deltaPhiStarExtraName = params["lowPtName"], etRatherThanPt = _etRatherThanPt),
             #steps.Jet.alphaMetHistogrammer(cs = _jet, deltaPhiStarExtraName = params["lowPtName"], etRatherThanPt = _etRatherThanPt, metName = _met),
+            ]
 
-            #signal selection
+        alphaT = [
             #steps.Other.variablePtGreaterFilter(140.0,"%sSumP4%s"%_jet,"GeV"),
             steps.Other.variableGreaterFilter(0.55,"%sAlphaT%s%s"%(_jet[0],"Et" if _etRatherThanPt else "Pt",_jet[1])),
-            #]), #end cutSorter
+        ]
 
-            #steps.Trigger.lowestUnPrescaledTriggerFilter(),
-            #steps.Trigger.l1Filter("L1Tech_BPTX_plus_AND_minus.v0"),
-            #
-            #steps.Trigger.physicsDeclaredFilter(),
-            #steps.Other.monsterEventFilter(),
-            #steps.Other.hbheNoiseFilter(),
-            #
-            #steps.Other.variableLessFilter(1.25,"%sMht%sOver%s"%(_jet[0],_jet[1]+params["highPtName"],_met)),
-            #steps.Other.deadEcalFilter(jets = _jet, extraName = params["lowPtName"], dR = 0.3, dPhiStarCut = 0.5),
-            
-            
+        postPlots = [
             steps.Other.histogrammer("vertexIndices", 20, -0.5, 19.5, title=";N vertices;events / bin", funcString="lambda x:len(x)"),
             steps.Other.histogrammer("%sIndices%s"%_jet, 20, -0.5, 19.5, title=";number of %s%s passing ID#semicolon p_{T}#semicolon #eta cuts;events / bin"%_jet, funcString="lambda x:len(x)"),
             steps.Jet.cleanJetHtMhtHistogrammer(_jet,_etRatherThanPt),
@@ -275,10 +278,15 @@ class hadronicLook(analysis.analysis) :
             steps.Other.histogrammer("%sDeltaPhiStar%s"%(_jet[0], _jet[1]), 20, 0.0, r.TMath.Pi(), title = ";#Delta#phi*;events / bin", funcString = 'lambda x:x[0][0]'),
             steps.Other.histogrammer("%sMht%sOver%s"%(_jet[0],_jet[1]+params["highPtName"],_met), 100, 0.0, 3.0,
                                      title = ";MHT %s%s / %s;events / bin"%(_jet[0],_jet[1]+params["highPtName"],_met)),
+            ]
 
-            steps.Other.histogrammer("%sRecHitSumPt"%params["objects"]["rechit"], 30, 0, 300, title = ";Sum of HBHE (sev.#geq10), EB,EE (sev.#geq2) RecHit p_{T} (GeV);events / bin"),
+        recHits = [
+            steps.Other.histogrammer("%sRecHitSumPt"%params["objects"]["rechit"], 30, 0, 300,
+                                     title = ";Sum of HBHE (sev.#geq10), EB,EE (sev.#geq2) RecHit p_{T} (GeV);events / bin"),
             steps.Filter.value("%sRecHitSumPt"%params["objects"]["rechit"], max = 30.0),
-            
+            ]
+
+        endGame = [
             #steps.Other.skimmer(),
             #steps.Other.duplicateEventCheck(),
             #steps.Other.cutBitHistogrammer(self.togglePfJet(_jet), self.togglePfMet(_met)),
@@ -311,7 +319,12 @@ class hadronicLook(analysis.analysis) :
             #                          #doGenJets = True,
             #                          markusMode = False,
             #                          ),
-            ] + scanAfter + [steps.Other.variableGreaterFilter(bin, "%sSumEt%s"%_jet, suffix = "GeV") for bin in [475, 575, 675, 775, 875]]
+            ]
+
+        htBins = [steps.Other.variableGreaterFilter(bin, "%sSumEt%s"%_jet, suffix = "GeV") for bin in [475, 575, 675, 775, 875]]
+
+        return scanBefore + eventLeadingJets + multXc + ht + mhtOverMet + mht + prePlots + \
+               deadEcal + aPlots + alphaT + postPlots + recHits + endGame + scanAfter + htBins
     
     def listOfSampleDictionaries(self) :
         return [samples.HT.ht, samples.JetMET.jetmet, samples.MC.mc]
@@ -345,11 +358,12 @@ class hadronicLook(analysis.analysis) :
             out = []
 
             jw = calculables.Other.jsonWeight("cert/Cert_160404-167913_7TeV_PromptReco_Collisions11_JSON.txt") #1078/pb            
-
+            
             out += specify(names = "HT.Run2011A-May10ReReco-v1.AOD.Bryn",   weights = jw, overrideLumi = 183.0)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Bryn1",   weights = jw, overrideLumi =  70.2)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Bryn2",   weights = jw, overrideLumi = 101.3)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Bryn3",   weights = jw, overrideLumi =  74.8)
+            out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Bryn4",   weights = jw, overrideLumi =  800000.8)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Darren1", weights = jw, overrideLumi = 181.2)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Darren2", weights = jw, overrideLumi = 122.8)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Darren3", weights = jw, overrideLumi =  36.4)
@@ -357,10 +371,7 @@ class hadronicLook(analysis.analysis) :
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Darren5", weights = jw, overrideLumi = 130.6)
             out += specify(names = "HT.Run2011A-PromptReco-v4.AOD.Darren6", weights = jw, overrideLumi = 116.0)
 
-            #out += specify(names = "HT_skim")
-            #out += specify(names = "MT2_events")
-            #out += specify(names = "qcd_py6_375")
-            #out += specify(names = "calo_375")
+            #out += specify(names = "calo_375_eps")
             return out
 
         def qcd_py6(eL) :
@@ -422,6 +433,7 @@ class hadronicLook(analysis.analysis) :
         era = "summer11"
         smLumi = 30000 # 1/pb
         susyLumi = 60000
+        #return dataEps()
         #return data()
         return ( data() +
                  qcd_func(smLumi) + #g_jets_func(eL) +
