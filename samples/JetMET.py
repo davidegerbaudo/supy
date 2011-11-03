@@ -7,6 +7,8 @@ jetmet.add("HT.Run2011A-May10ReReco-v1.AOD.Bryn",   '%s/bm409//ICF/automated/201
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Bryn1",   '%s/bm409//ICF/automated/2011_06_08_10_14_46/",   alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Bryn2",   '%s/bm409//ICF/automated/2011_06_04_19_40_33/",   alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Bryn3",   '%s/bm409//ICF/automated/2011_06_10_15_13_48/",   alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
+jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Bryn4",   '%s/bm409//ICF/automated/2011_10_14_11_58_05/")'                               %srm, lumi = 1.0)#to make up for lost ntuples
+
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Darren1", '%s/dburton//ICF/automated/2011_06_16_10_30_36/", alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Darren2", '%s/dburton//ICF/automated/2011_06_22_13_44_34/", alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
 jetmet.add("HT.Run2011A-PromptReco-v4.AOD.Darren3", '%s/dburton//ICF/automated/2011_06_23_09_27_46/", alwaysUseLastAttempt = True)'%srm, lumi = 1.0)
@@ -19,7 +21,7 @@ jetmet.add("calo_275_scaled", 'utils.fileListFromDisk(location = "/home/hep/elai
 jetmet.add("calo_325_scaled", 'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v6/325_scaled.root", isDirectory = False)', lumi = 189)
 #jetmet.add("calo_375",        'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v6/375.root", isDirectory = False)', lumi = 189)
 #jetmet.add("calo_375",        'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v7/375_*Format.root", isDirectory = False)', lumi = 248)
-#jetmet.add("calo_375",        'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v8/375.root", isDirectory = False)', lumi = 1080.)
+jetmet.add("calo_375_eps",    'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v8/375.root", isDirectory = False)', lumi = 1080.)
 jetmet.add("calo_375",        'utils.fileListFromDisk(location = "/home/hep/elaird1/73_candidates/v9/HT_375_skim_27fb.root", isDirectory = False)', lumi = 2639.)
 
 jetmet.add("bryns_events", 'utils.fileListFromDisk(location = "/vols/cms03/bm409/SUSYv2Test/SUSYv2/bryn/results/Data_tedSync/*.root", isDirectory = False)', lumi = 248)
