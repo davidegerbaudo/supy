@@ -51,9 +51,9 @@ class hadronicSkim(analysis.analysis) :
     def listOfSamples(self, params) :
         from samples import specify
         out = []
-        out += specify(names = "znunu_jets_mg_ht_50_100")
-        out += specify(names = "znunu_jets_mg_ht_100_200")
-        out += specify(names = "znunu_jets_mg_ht_200_inf")
+        #out += specify(names = "znunu_jets_mg_ht_50_100")
+        #out += specify(names = "znunu_jets_mg_ht_100_200")
+        out += specify(names = "g_jets_mg_ht_200_inf_spring11", nFilesMax = 1)
         return out
 
     def listOfSampleDictionaries(self) :
