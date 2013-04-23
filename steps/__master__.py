@@ -1,4 +1,7 @@
-import supy,os,configuration
+import supy,os
+try: import configuration
+except: import supy.defaults as configuration
+
 #####################################
 class master(supy.analysisStep) :
     def __init__(self, xs, xsPostWeights, lumi, lumiWarn) :

@@ -1,5 +1,7 @@
 import os,sys,tempfile,re
-import utils,steps,samples,configuration,calculables,sites
+import utils,steps,samples,calculables,sites
+try: import configuration
+except: import supy.defaults as configuration
 from __organizer__ import organizer
 from __analysisLooper__ import analysisLooper
 from __analysisStep__ import analysisStep

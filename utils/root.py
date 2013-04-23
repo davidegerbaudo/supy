@@ -1,4 +1,6 @@
-import configuration,os,math,array, ROOT as r
+import os,math,array, ROOT as r
+try: import configuration
+except: import supy.defaults as configuration
 try:  import numpy as np
 except: np = None
 

@@ -1,4 +1,6 @@
-import os,socket,configuration
+import os,socket
+try: import configuration
+except: import supy.defaults as configuration
 
 def site() :
     d = {"hep.ph.ic.ac.uk":"ic",

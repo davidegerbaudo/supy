@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import supy
-import sys,os,tempfile,configuration
+import sys,os,tempfile
+try: import configuration
+except: import supy.defaults as configuration
 import __init__ as utils
 
 def cvsEnv() :

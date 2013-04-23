@@ -1,6 +1,8 @@
 import ROOT as r
 import os,math,string,itertools,re
-import utils,configuration as conf
+import utils
+try: import configuration as conf
+except: import supy.defaults as conf
 from supy import whereami
 
 ##############################

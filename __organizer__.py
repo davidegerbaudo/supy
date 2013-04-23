@@ -1,6 +1,8 @@
 import ROOT as r
 import copy,re
-import configuration,utils
+import utils
+try: import configuration
+except: import supy.defaults as configuration
 
 class organizer(object) :
     """Organize step and histograms.

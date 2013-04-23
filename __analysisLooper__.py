@@ -1,5 +1,6 @@
 import copy,os,collections
-import configuration
+try: import configuration
+except: import supy.defaults as configuration
 from supy import autoBook,wrappedChain,utils,keyTracer
 import ROOT as r
 #####################################
